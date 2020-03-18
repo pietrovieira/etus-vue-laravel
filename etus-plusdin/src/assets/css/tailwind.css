@@ -1,0 +1,7 @@
+button{
+    outline: none !important;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
