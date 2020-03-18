@@ -19,5 +19,4 @@ etus-plusdin/*.log
 etus-plusdin/node_modules/
 etus-plusdin/public/
 etus-plusdin/.deploy*/
-etus-plusdin/src/_drafts
 etus-plusdin/package-lock.json
