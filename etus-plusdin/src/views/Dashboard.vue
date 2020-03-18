@@ -1,7 +1,7 @@
 <template>
   <section v-show="isShow" class="flex flex-col justify-between">
-    <Header>
-      <a @click="addProduct" class="mt-5 mx-4 md:mt-0">
+    <Header homeLink="/dashboard">
+      <a @click="addProduct" class="mt-5 cursor-pointer mx-4 md:mt-0">
         Add Product
       </a>
     </Header>
@@ -13,8 +13,11 @@
             type="text"
             placeholder="Credit card name"
             aria-label="Credit card name"
+            v-model="search"
+            @keyup.enter="handleSearch"
           />
           <button
+            @click="handleSearch"
             class="flex-shrink-0 bg-green-500 hover:bg-green-700 border-green-500 hover:border-green-700 text-sm border-4 text-white py-1 px-2 rounded"
             type="button"
           >
@@ -61,42 +64,53 @@
                   class="flex-shrink-0 ml-3 bg-red-500 w-1/2 hover:bg-red-700 border-red-500 hover:border-red-700 text-sm border-4 text-white py-1 px-2 rounded"
                   type="button"
                 >
-                  Delete
+                  {{labelDeleted[card.id] === undefined ? 'Delete' : 'Loading...' }}
                 </button>
                 </div>
               </td>
             </tr>
           </tbody>
         </table>
+        <!--  -->
+        <div class="inline-flex w-full justify-between my-8">
+          <button @click="handlePrevPage" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l">
+            Prev
+          </button>
+          <button @click="handleNextPage" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-r">
+            Next
+          </button>
+        </div>
       </div>
     </div>
-    <footer class="text-center mt-6 py-4 text-white bg-green-600 text-xs w-full">
-      &copy;2020 Plusdin. All rights reserved.
-    </footer>
+    <Footer />
   </section>
 </template>
 
 <script>
 import axios from "axios";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import { mapGetters, mapActions } from "vuex";
 export default {
   components: {
-    Header
+    Header,
+    Footer
   },
   computed: {
     ...mapGetters({
+      getPage: "card/getPage",
       getCardList: 'card/getList'
     })
   },
   data() {
     return {
       isShow: false,
-      cards: []
+      labelDeleted: [],
+      cards: [],
+      search: ''
     };
   },
   async created() {
-    this.scroll(this.cards);
     try
     {
       await this.cardFindAll();
@@ -104,12 +118,22 @@ export default {
     }catch(error){
       this.isShow = false;
       if ( error.status ){
-        this.$router.replace('/login');
+        this.$router.replace('/');
       }
-      console.log("error", error.status);
     }
   },
   methods: {
+    async handleSearch(){
+      await this.cardSearch(this.search);
+    },
+    async handlePrevPage(){
+      let _page = this.getPage - 1;
+      await this.cardFindAll(_page,6);
+    },
+    async handleNextPage(){
+      let _page = this.getPage + 1;
+      await this.cardFindAll(_page,6);
+    },
     goDetail(detail){
       this.setCardEdit(detail);
       this.$router.push('/edit-product');
@@ -129,25 +153,26 @@ export default {
       });
       this.$router.push('/add-product');
     },
-    handleDelete(id){
-
-    },
-    scroll(card) {
-      window.onscroll = () => {
-        let bottomOfWindow =
-          document.documentElement.scrollTop + window.innerHeight ===
-          document.documentElement.offsetHeight;
-
-        if (bottomOfWindow) {
-          // axios.get(`https://randomuser.me/api/`).then(response => {
-          //   this.cards.push(response.data.results[0]);
-          // });
+    async handleDelete(id){
+      const _confirm = confirm('Are you sure?');
+      const _vm = this;
+      if ( _confirm )
+      {
+        const _id = parseInt(id);
+        _vm.labelDeleted[_id] = true;
+        const res = await _vm.cardDelete(_id);
+        if ( res.status === 200 ){
+          _vm.labelDeleted[_id] = undefined;
+          await _vm.cardFindAll();
+          _vm.$noty.success(res.data.message);
         }
-      };
+      }
     },
     ...mapActions({
+      cardSearch: 'card/search',
       cardFindAll: 'card/findAll',
-      setCardEdit: 'card/setEdit'
+      setCardEdit: 'card/setEdit',
+      cardDelete: 'card/delete'
     })
   }
 };

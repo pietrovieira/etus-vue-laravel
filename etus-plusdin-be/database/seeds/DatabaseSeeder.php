@@ -5,7 +5,7 @@ use Illuminate\Database\Seeder;
 
 use Illuminate\Support\Str;
 // use App\User;
-// use App\Category;
+use App\Category;
 use App\Brand;
 use Faker\Generator as Faker;
 
@@ -19,7 +19,8 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         factory(App\User::class, 1)->create();
-        factory(App\Category::class, 10)->create();
+        // factory(App\Category::class, 10)->create();
+        // 
         Brand::create(
             [
                 'name' => 'Mastercard',
@@ -38,6 +39,27 @@ class DatabaseSeeder extends Seeder
         Brand::create(
             [
                 'name' => 'Elo',
+            ]
+        );
+        // 
+        Category::create(
+            [
+                'name' => 'Ouro',
+            ]
+        );
+        Category::create(
+            [
+                'name' => 'Prata',
+            ]
+        );
+        Category::create(
+            [
+                'name' => 'Platina',
+            ]
+        );
+        Category::create(
+            [
+                'name' => 'Preto',
             ]
         );
 

@@ -51,15 +51,6 @@ const actions={
     update(context,payload){
         return new Promise((resolve,reject)=>{
             context.commit('setLoaded',false);
-            if ( payload.name === null || payload.name === 'null' ){
-                delete payload['name'];
-            }
-            if ( payload.slug === null || payload.slug === 'null' ){
-                delete payload['slug'];
-            }
-            if ( payload.imagem === undefined || payload.imagem === 'undefined' ){
-                delete payload['imagem'];
-            }
             serviceCard.update(payload)
             .then(response=>{
                 context.commit('setLoaded',true);
@@ -76,16 +67,23 @@ const actions={
     create(context,payload){
         return new Promise((resolve,reject)=>{
             context.commit('setLoaded',false);
-            if ( payload.name === null && payload.name === 'null' ){
-                delete payload['name'];
-            }
-            if ( payload.slug === null && payload.slug === 'null' ){
-                delete payload['slug'];
-            }
-            if ( payload.imagem === undefined && payload.imagem === 'undefined' ){
-                delete payload['imagem'];
-            }
             serviceCard.create(payload)
+            .then(response=>{
+                context.commit('setLoaded',true);
+                resolve(response);
+                return;
+            })
+            .catch(error=>{
+                context.commit('setLoaded',true);
+                reject(error.response);
+                return;
+            })            
+        })
+    },
+    delete(context,payload){
+        return new Promise((resolve,reject)=>{
+            context.commit('setLoaded',false);
+            serviceCard.delete(payload)
             .then(response=>{
                 context.commit('setLoaded',true);
                 resolve(response);
@@ -102,6 +100,20 @@ const actions={
         return new Promise((resolve,reject)=>{
             serviceCard.findOne(payload)
             .then(response=>{
+                resolve(response);
+                return;
+            })
+            .catch(error=>{
+                reject(error.response);
+                return;
+            })            
+        })
+    },
+    search(context,payload){
+        return new Promise((resolve,reject)=>{
+            serviceCard.findAll(0,100,payload)
+            .then(response=>{
+                context.commit('setList',response.data.data);
                 resolve(response);
                 return;
             })

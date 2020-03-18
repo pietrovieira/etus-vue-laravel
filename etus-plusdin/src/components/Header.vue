@@ -3,7 +3,7 @@
     class="flex items-center justify-between flex-wrap  p-6 w-full z-30 shadow-lg"
   >
     <div class="flex items-center flex-shrink-0 text-green-600 mr-6">
-      <router-link to="/"
+      <router-link :to="homeLink"
         >
       <Logo />
         </router-link
@@ -41,6 +41,12 @@ export default {
   components: {
     Logo
   },
+  props: {
+    homeLink: {
+      type: String,
+      default: '/'
+    }
+  },
   computed: {
     ...mapGetters({
       getLogged: "user/getLogged"
@@ -52,6 +58,10 @@ export default {
     }),
     async handleLogout(){
       await this.userLogout();
+      this.$noty.success('You have successfully logged out',{
+        timeout: 1000,
+        progressBar: false,
+      });
       this.$router.replace('/login');
     }
   }

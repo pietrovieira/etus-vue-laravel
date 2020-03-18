@@ -47,7 +47,7 @@ Route::group([
 
     Route::post('create', 'CardController@update');
     Route::post('update', 'CardController@update');
-    Route::delete('delete', 'CardController@delete');
+    Route::post('delete', 'CardController@delete');
     Route::get('findall', 'CardController@findall');
     Route::get('findone', 'CardController@findone');
 

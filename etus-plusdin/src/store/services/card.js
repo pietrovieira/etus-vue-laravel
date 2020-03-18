@@ -27,12 +27,20 @@ serviceCard.findOne = async (id) => {
     return res;
 }
 
+serviceCard.delete = async (id) => {
+    const res = await axios.post(`${config.apiUrl}/card/delete`,{
+        id
+    });
+    return res;
+}
+
 serviceCard.create = async (payload) => {
     const formData = new FormData();
     formData.append('id',payload.id);
     formData.append('name',payload.name);
     formData.append('slug',payload.slug);
     formData.append('imagem',payload.imagem);
+    formData.append('imagem_uploaded',( payload.imagem_uploaded ? 1 : 0 ));
     formData.append('brand_id',payload.brand_id);
     formData.append('category_id',payload.category_id);
     if ( payload.limit )
@@ -49,6 +57,7 @@ serviceCard.update = async (payload) => {
     formData.append('name',payload.name);
     formData.append('slug',payload.slug);
     formData.append('imagem',payload.imagem);
+    formData.append('imagem_uploaded',( payload.imagem_uploaded ? 1 : 0 ));
     formData.append('brand_id',payload.brand_id);
     formData.append('category_id',payload.category_id);
     if ( payload.limit )

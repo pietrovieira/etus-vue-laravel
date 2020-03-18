@@ -1,6 +1,9 @@
 <template>
   <div class="w-full max-w-lg">
     <div class="flex flex-wrap">
+        <div v-if="edit" style="max-width: 180px; margin: 0 auto">
+          <img class="mb-4 w-full" :src="image_display" :alt="form.name" />
+        </div>
       <div class="w-full px-3">
         <label
           class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
@@ -37,10 +40,18 @@
       </div>
       <div class="w-full md:w-1/2 px-3">
         <label
+        v-if="!edit"
           class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
           for="image"
         >
-          Image
+          Insert Image
+        </label>
+        <label
+        v-if="edit"
+          class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+          for="image"
+        >
+          Update Image
         </label>
         <input
           class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
@@ -177,14 +188,14 @@ export default {
     }),
     changeFile(event){
       this.form.imagem = event.target.files[0];
-      // console.log("changeFile", event.target.files)
+      this.form.imagem_uploaded = false;
     },
     async handleCreate() {
       try{
         this.label = 'Loading...';
         const res = await this.cardCreate(this.form);
         this.$noty.success(res.data.message,{
-          timeout: 2000,
+          timeout: 1000,
           progressBar: false,
         });
         this.label = 'Create';
@@ -199,13 +210,13 @@ export default {
         {
           case 422:
             this.$noty.warning('Name, Slug, Image, Brand, Category is required.',{
-              timeout: 2000,
+              timeout: 1000,
               progressBar: false,
             });
           break;
           default:
             this.$noty.error(dataError.message,{
-              timeout: 2000,
+              timeout: 1000,
               progressBar: false,
             });
         }
@@ -216,7 +227,7 @@ export default {
         this.label = 'Loading...';
         const res = await this.cardUpdate(this.form);
         this.$noty.success(res.data.message,{
-          timeout: 2000,
+          timeout: 1000,
           progressBar: false,
         });
         this.label = 'Update';
@@ -231,13 +242,13 @@ export default {
         {
           case 422:
             this.$noty.warning('Name, Slug, Image, Brand, Category is required.',{
-              timeout: 2000,
+              timeout: 1000,
               progressBar: false,
             });
           break;
           default:
             this.$noty.error(dataError.message,{
-              timeout: 2000,
+              timeout: 1000,
               progressBar: false,
             });
         }
@@ -246,23 +257,37 @@ export default {
   },
   created(){
     this.edit = false;
-    this.form = this.getCardEdit;
+    this.label = 'Create';
     this.form.category_id = this.getCategories[0].id;
     this.form.brand_id = this.getBrands[0].id;
     if ( this.getCardEdit.name !== null){
       this.edit = true;
-      this.form.category_id = this.getCardEdit.category.id;
-      this.form.brand_id = this.getCardEdit.brand.id;
+      this.label = 'Update';
+      this.image_display = this.getCardEdit.imagem;
+      this.form = {
+        id: this.getCardEdit.id,
+        name: this.getCardEdit.name,
+        slug: this.getCardEdit.slug,
+        imagem_uploaded: true,
+        imagem: ( this.getCardEdit.imagem === null ? '' : this.getCardEdit.imagem),
+        category_id: ( this.getCardEdit.category.id === null ? this.getCategories[0].id : this.getCardEdit.category.id),
+        brand_id: ( this.getCardEdit.brand.id === null ? this.getBrands[0].id : this.getCardEdit.brand.id),
+        limit_tax: ( this.getCardEdit.limit_tax === null ? 0 : this.getCardEdit.limit_tax),
+        limit: ( this.getCardEdit.limit === null ? 0 : this.getCardEdit.limit),
+      };
     }
   },
   data(){
     return {
       label: 'Create',
       edit: false,
+      image_display: '',
       form: {
         id: 0,
-        name: null,
-        slug: null,
+        name: '',
+        slug: '',
+        imagem_uploaded: false,
+        imagem: '',
         category_id: 0,
         brand_id: 0,
         limit_tax: 0,

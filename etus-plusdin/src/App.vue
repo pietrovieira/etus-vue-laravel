@@ -17,7 +17,7 @@ export default {
   async created(){
     if ( this.getAccessToken ){
       axios.defaults.headers.common = {'Authorization': `Bearer ${this.getAccessToken}`};
-      this.$router.replace("/dashboard");
+      this.$router.replace("/");
     }
   }
 }
